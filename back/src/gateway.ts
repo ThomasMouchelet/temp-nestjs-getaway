@@ -24,8 +24,8 @@ export class Gateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client disconnected: ${client.id}`);
   }
 
-  @SubscribeMessage('message')
+  @SubscribeMessage('messageFromFront')
   handleMessage(client: Socket, payload: any): void {
-    this.server.emit('message', payload);
+    this.server.emit('messageFromBack', 'new message from back');
   }
 }

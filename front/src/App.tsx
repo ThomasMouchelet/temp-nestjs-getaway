@@ -2,18 +2,33 @@ import { useEffect, useState } from "react";
 import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
 function App() {
   const [count, setCount] = useState(0);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
   useEffect(() => {
     const socket = io("http://localhost:8000");
 
     socket.on("connect", () => {
       console.log("Connected to server");
+      setSocket(socket);
     });
+
+    socket.on("messageFromBack", (message: string) => {
+      console.log("Message from server:", message);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
+
+  const handleClick = () => {
+    if (!socket) return;
+    socket.emit("messageFromFront", "Hello from client");
+  };
 
   return (
     <>
@@ -27,9 +42,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+        <button onClick={handleClick}>count is {count}</button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
